@@ -222,6 +222,13 @@
             const message = input.value.trim();
             if (!message) return;
 
+            const apiBase = String(window.KONE_API_BASE || '').replace(/\/$/, '');
+            if (!apiBase && window.location.hostname.includes('github.io')) {
+                chatBox.innerHTML += `<div class="message agent-message" style="color: #c62828;">Backend URL is not configured. Set GitHub Actions variable PUBLIC_API_BASE_URL to your API host (HTTPS).</div>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+                return;
+            }
+
             chatBox.innerHTML += `<div class="message user-message">${message}</div>`;
             input.value = '';
             
@@ -230,14 +237,25 @@
             chatBox.scrollTop = chatBox.scrollHeight;
 
             try {
-                const apiBase = String(window.KONE_API_BASE || '').replace(/\/$/, '');
                 const endpoint = apiBase ? `${apiBase}/api/agent` : '/api/agent';
                 const response = await fetch(endpoint, { 
                     method: 'POST', 
                     headers: { 'Content-Type': 'application/json' }, 
                     body: JSON.stringify({ message: message }) 
                 });
-                const data = await response.json();
+
+                let data = {};
+                const contentType = response.headers.get('content-type') || '';
+                if (contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    const text = await response.text();
+                    throw new Error(`Backend returned non-JSON response (HTTP ${response.status}). ${text.slice(0, 120)}`);
+                }
+
+                if (!response.ok) {
+                    throw new Error(data.response || `Backend request failed with HTTP ${response.status}`);
+                }
                 
                 document.getElementById(loadingId).remove();
                 
@@ -246,7 +264,7 @@
                 chatBox.innerHTML += `<div class="message agent-message"><strong>Assistant:</strong><br>${formattedResponse}</div>`;
             } catch (error) {
                 document.getElementById(loadingId).remove();
-                chatBox.innerHTML += `<div class="message agent-message" style="color: red;">Error connecting to backend.</div>`;
+                chatBox.innerHTML += `<div class="message agent-message" style="color: red;">Error connecting to backend. ${error.message || ''}</div>`;
             }
             chatBox.scrollTop = chatBox.scrollHeight;
         }
