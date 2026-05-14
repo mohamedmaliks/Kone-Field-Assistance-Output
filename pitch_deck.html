@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KONE Copilot Hackathon - Technical Presentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-a: #06161a;
+      --bg-b: #0d2425;
+      --bg-c: #102f2b;
+      --ink: #ecf7f3;
+      --muted: #b7d3c8;
+      --accent: #24d08a;
+      --accent-2: #ffb347;
+      --card: rgba(10, 30, 29, 0.74);
+      --line: rgba(165, 235, 203, 0.23);
+      --good: #29d18f;
+      --warn: #ffd166;
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      color: var(--ink);
+      font-family: "Sora", "Segoe UI", Tahoma, sans-serif;
+      background: radial-gradient(circle at 14% 18%, rgba(36, 208, 138, 0.24), transparent 30%),
+                  radial-gradient(circle at 82% 24%, rgba(255, 179, 71, 0.2), transparent 28%),
+                  linear-gradient(130deg, var(--bg-a), var(--bg-b) 48%, var(--bg-c));
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      width: 40vmax;
+      height: 40vmax;
+      border-radius: 50%;
+      filter: blur(54px);
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.3;
+      animation: drift 16s ease-in-out infinite alternate;
+    }
+
+    body::before {
+      background: #19b6b5;
+      top: -18vmax;
+      right: -12vmax;
+    }
+
+    body::after {
+      background: #e09f3e;
+      bottom: -15vmax;
+      left: -10vmax;
+      animation-delay: 2s;
+    }
+
+    @keyframes drift {
+      from { transform: translate(0, 0) scale(1); }
+      to { transform: translate(18px, -12px) scale(1.08); }
+    }
+
+    .deck {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+    }
+
+    .brand-fixed {
+      position: fixed;
+      top: 14px;
+      right: 14px;
+      z-index: 12;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(5, 21, 18, 0.82);
+      padding: 8px 10px;
+      backdrop-filter: blur(4px);
+    }
+
+    .brand-fixed img {
+      width: 78px;
+      height: auto;
+      display: block;
+      border-radius: 4px;
+      background: #ffffff;
+      padding: 2px;
+    }
+
+    .brand-fixed span {
+      font-family: "Space Grotesk", "Sora", sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: clamp(28px, 4vw, 64px);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(36px) scale(0.985);
+      transition: opacity 380ms ease, transform 420ms ease;
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0) scale(1);
+    }
+
+    .topline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: "Space Grotesk", "Sora", sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      font-size: clamp(11px, 1.2vw, 13px);
+      margin-bottom: 10px;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 12px;
+      background: rgba(5, 24, 22, 0.45);
+    }
+
+    .content {
+      display: grid;
+      gap: 18px;
+      align-content: center;
+      max-width: 1100px;
+    }
+
+    h1,
+    h2,
+    h3,
+    p,
+    ul,
+    ol { margin: 0; }
+
+    h1 {
+      font-size: clamp(32px, 6vw, 78px);
+      line-height: 1.02;
+      letter-spacing: -0.03em;
+      max-width: 1100px;
+    }
+
+    h2 {
+      font-size: clamp(26px, 4.2vw, 54px);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      max-width: 1080px;
+    }
+
+    .kicker {
+      font-size: clamp(15px, 2vw, 22px);
+      color: var(--accent-2);
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      font-family: "Space Grotesk", "Sora", sans-serif;
+    }
+
+    .lead {
+      max-width: 960px;
+      font-size: clamp(17px, 2vw, 30px);
+      line-height: 1.35;
+      color: #ddf3ec;
+    }
+
+    .grid2,
+    .grid3,
+    .grid4 {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: clamp(14px, 1.8vw, 22px);
+      backdrop-filter: blur(4px);
+      min-height: 128px;
+    }
+
+    .card h3 {
+      font-size: clamp(18px, 2vw, 30px);
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .card p,
+    .card li {
+      font-size: clamp(14px, 1.2vw, 19px);
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    ul,
+    ol {
+      padding-left: 1.1em;
+      max-width: 1050px;
+    }
+
+    li {
+      margin: 8px 0;
+      font-size: clamp(16px, 1.7vw, 28px);
+      line-height: 1.35;
+    }
+
+    .score {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .score .pill {
+      border: 1px solid var(--line);
+      background: rgba(7, 35, 29, 0.65);
+      border-radius: 16px;
+      padding: 10px;
+      text-align: center;
+      font-size: clamp(12px, 0.95vw, 14px);
+      color: #dbf3eb;
+      font-family: "Space Grotesk", "Sora", sans-serif;
+    }
+
+    .score strong {
+      display: block;
+      font-size: clamp(22px, 2.2vw, 32px);
+      color: var(--accent);
+      margin-top: 4px;
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .timeline .step {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      background: rgba(8, 28, 25, 0.64);
+      font-size: clamp(13px, 1vw, 17px);
+      line-height: 1.45;
+      color: #d6ede6;
+    }
+
+    .accent { color: var(--accent); }
+    .warn { color: var(--warn); }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--muted);
+      font-size: clamp(12px, 1vw, 16px);
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+      font-family: "Space Grotesk", "Sora", sans-serif;
+    }
+
+    .controls {
+      position: fixed;
+      right: 14px;
+      bottom: 14px;
+      z-index: 10;
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      color: var(--ink);
+      background: rgba(5, 21, 18, 0.76);
+      border-radius: 10px;
+      padding: 8px 11px;
+      cursor: pointer;
+      font-family: "Space Grotesk", "Sora", sans-serif;
+    }
+
+    .btn:hover { background: rgba(18, 58, 48, 0.76); }
+
+    .hint {
+      position: fixed;
+      left: 14px;
+      bottom: 14px;
+      z-index: 10;
+      color: var(--muted);
+      font-size: 12px;
+      font-family: "Space Grotesk", "Sora", sans-serif;
+      border: 1px solid var(--line);
+      background: rgba(5, 21, 18, 0.68);
+      border-radius: 10px;
+      padding: 8px 10px;
+    }
+
+    @media (max-width: 980px) {
+      .brand-fixed {
+        top: 8px;
+        right: 8px;
+        padding: 6px 8px;
+      }
+
+      .brand-fixed img {
+        width: 62px;
+      }
+
+      .brand-fixed span {
+        display: none;
+      }
+
+      .grid2,
+      .grid3,
+      .grid4,
+      .score,
+      .timeline {
+        grid-template-columns: 1fr;
+      }
+
+      .slide {
+        overflow-y: auto;
+        padding-bottom: 78px;
+      }
+    }
+
+    @media print {
+      body {
+        overflow: visible;
+        background: #0f1516;
+      }
+
+      .controls,
+      .hint { display: none; }
+
+      .slide {
+        position: relative;
+        opacity: 1 !important;
+        pointer-events: auto;
+        transform: none !important;
+        page-break-after: always;
+        min-height: 100vh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="brand-fixed">
+    <img src="assets/kone-logo.png" alt="KONE logo" />
+    <span>KONE Internal</span>
+  </div>
+  <main class="deck" id="deck">
+    <section class="slide active" data-title="Title">
+      <div class="topline">
+        <span class="chip">KONE GitHub Copilot Hackathon</span>
+        <span class="chip">Technical Presentation</span>
+      </div>
+      <div class="content">
+        <p class="kicker">Mission</p>
+        <h1>From Copilot Demo to <span class="accent">Business-Ready Engineering Co-Pilot</span></h1>
+        <p class="lead">This presentation explains our technical implementation, integration model, and measurable engineering impact for Copilot judges.</p>
+        <p class="lead">Team Members: Arokiadoss A Ananth, Malik S Mohamed (EXT), Muppidi Satish Kumar, Murali Praveen</p>
+      </div>
+      <div class="footer">
+        <span>Team: KONE Hackathon Team</span>
+        <span>Presenter: Malik S Mohamed (EXT)</span>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Approach">
+      <div class="topline">
+        <span class="chip">Technical Scope</span>
+        <span class="chip">System Boundaries</span>
+      </div>
+      <div class="content">
+        <h2>System Scope Implemented by Our Team</h2>
+        <div class="grid3">
+          <article class="card">
+            <h3>Custom Agent Layer</h3>
+            <p>Flask-based Copilot interface with intent router: fault, parameter, and general support paths.</p>
+          </article>
+          <article class="card">
+            <h3>Custom MCP Layer</h3>
+            <p>Tooling for official fault lookup, parameter guidance, technician workflow, and source traceability.</p>
+          </article>
+          <article class="card">
+            <h3>Code + Data Layer</h3>
+            <p>Indexed fault workbook, UI parameters, and iex_cpu source for grounded and explainable answers.</p>
+          </article>
+        </div>
+        <p class="lead">Target outcome: <span class="accent">accurate troubleshooting, explainable technical detail, and repeatable field workflow</span>.</p>
+      </div>
+      <div class="footer">
+        <span>Core principle: evidence over claims</span>
+        <span>Slide 2</span>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Problem">
+      <div class="topline">
+        <span class="chip">Problem</span>
+        <span class="chip">Current Gap</span>
+      </div>
+      <div class="content">
+        <h2>Field Troubleshooting Is Slow, Fragmented, and Error-Prone</h2>
+        <ul>
+          <li>Knowledge is spread across fault manuals, UI parameter sheets, and source code.</li>
+          <li>Engineers spend time searching instead of fixing.</li>
+          <li>Wrong recommendations for communication faults can increase downtime.</li>
+          <li>General chat agents lack strict guardrails for official fault definitions.</li>
+        </ul>
+        <div class="grid2">
+          <article class="card">
+            <h3 class="warn">Business Risk</h3>
+            <p>Higher MTTR, inconsistent service quality, and reduced trust in digital tools.</p>
+          </article>
+          <article class="card">
+            <h3 class="accent">Opportunity</h3>
+            <p>Create a Copilot assistant that is accurate, explainable, and field-usable.</p>
+          </article>
+        </div>
+      </div>
+      <div class="footer">
+        <span>Outcome target: faster, safer, repeatable diagnostics</span>
+        <span>Slide 3</span>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Solution">
+      <div class="topline">
+        <span class="chip">Architecture</span>
+        <span class="chip">Custom Components</span>
+      </div>
+      <div class="content">
+        <h2>Technical Architecture and Runtime Flow</h2>
+        <div class="grid4">
+          <article class="card">
+            <h3>Custom Copilot Agent</h3>
+            <p>Message normalization, intent classification, and response orchestration in agent_server.py.</p>
+          </article>
+          <article class="card">
+            <h3>Custom MCP Server</h3>
+            <p>kone_mcp_server.py exposes find_fault_definition, technician_guidance, parameter_guidance, and source search tools.</p>
+          </article>
+          <article class="card">
+            <h3>Custom Skill + Prompting</h3>
+            <p>Fault handling guardrails ensure official-definition-first flow and technical detail only when requested.</p>
+          </article>
+          <article class="card">
+            <h3>Traceable Engineering Output</h3>
+            <p>Fault responses can include source-level trigger snippets mapped to iex_cpu when technical mode is asked.</p>
+          </article>
+        </div>
+        <p class="lead">Design principle: <span class="accent">strict correctness by default</span>, optional deep diagnostics, and reproducible output.</p>
+      </div>
+      <div class="footer">
+        <span>Built for technicians first, developers second</span>
+        <span>Slide 4</span>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Git Workflow">
+      <div class="topline">
+        <span class="chip">GitLab Integration</span>
+        <span class="chip">Branch and Hook Workflow</span>
+      </div>
+      <div class="content">
+        <h2>Branch-Driven Development and Auto Refresh</h2>
+        <div class="timeline">
+          <div class="step"><strong>Step 1</strong><br />Engineer commits updates in GitLab branch (iex_cpu source or rules).</div>
+          <div class="step"><strong>Step 2</strong><br />post-commit hook triggers build_index.py in background.</div>
+          <div class="step"><strong>Step 3</strong><br />Vector DB refreshes fault, parameter, and source contexts.</div>
+          <div class="step"><strong>Step 4</strong><br />Agent uses updated MCP tools on next request without manual sync.</div>
+          <div class="step"><strong>Step 5</strong><br />Team validates behavior with fault and parameter regression prompts.</div>
+        </div>
+      </div>
+      <div class="footer">
+        <span>This workflow keeps answers aligned with latest branch changes</span>
+        <span>Slide 5</span>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Technical Deep Dive">
+      <div class="topline">
+        <span class="chip">Technical Deep Dive</span>
+        <span class="chip">Custom MCP and Agent</span>
+      </div>
+      <div class="content">
+        <h2>Custom MCP, Agent and Skill Behavior</h2>
+        <div class="score">
+          <div class="pill">Fault Code Normalization<br />104_1 = 104-1</div>
+          <div class="pill">Exact Match First<br />No guessing</div>
+          <div class="pill">Parameter Intent Rules<br />Deterministic routing</div>
+          <div class="pill">Technical Mode Toggle<br />On request only</div>
+          <div class="pill">Field Step Inference<br />Operational output</div>
+          <div class="pill">Source Snippet Trace<br />Code-backed analysis</div>
+        </div>
+        <div class="grid2">
+          <article class="card">
+            <h3>Custom Agent Logic</h3>
+            <p>Intent router separates fault, parameter, and conversational requests before tool execution.</p>
+          </article>
+          <article class="card">
+            <h3>Custom Skill Policy</h3>
+            <p>Fault responses follow official definition structure and expose deeper technical context only on demand.</p>
+          </article>
+        </div>
+      </div>
+      <div class="footer">
+        <span>Behavior is deterministic for safety-critical troubleshooting paths</span>
+        <span>Slide 6</span>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Results">
+      <div class="topline">
+        <span class="chip">Measured Results</span>
+        <span class="chip">Before vs After</span>
+      </div>
+      <div class="content">
+        <h2>Key Outcomes Already Achieved</h2>
+        <div class="grid2">
+          <article class="card">
+            <h3>Data Completeness</h3>
+            <p>UI parameter index expanded from <strong>13</strong> to <strong>460</strong> searchable entries.</p>
+          </article>
+          <article class="card">
+            <h3>Response Safety</h3>
+            <p>Technical trigger details hidden by default and shown only when explicitly requested.</p>
+          </article>
+          <article class="card">
+            <h3>Fault Correctness</h3>
+            <p>Communication faults avoid unrelated parameter advice when no explicit UI reset row exists.</p>
+          </article>
+          <article class="card">
+            <h3>Engineering Velocity</h3>
+            <p>Git post-commit hook auto-rebuilds index to keep assistant context fresh.</p>
+          </article>
+        </div>
+      </div>
+      <div class="footer">
+        <span>These metrics directly support business and usability scores</span>
+        <span>Slide 7</span>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Roadmap">
+      <div class="topline">
+        <span class="chip">Demo Checklist</span>
+        <span class="chip">Technical Validation</span>
+      </div>
+      <div class="content">
+        <h2>Judge-Facing Technical Demo Sequence</h2>
+        <div class="grid3">
+          <article class="card">
+            <h3>Fault Normal Mode</h3>
+            <p>Query 104_1 and show official definition, reset/parameter action, and field steps.</p>
+          </article>
+          <article class="card">
+            <h3>Fault Technical Mode</h3>
+            <p>Query 104_1 technical details and show code-level trigger snippets from iex_cpu source.</p>
+          </article>
+          <article class="card">
+            <h3>Parameter Retrieval</h3>
+            <p>Query mode change during running and show parameter guidance from refreshed index.</p>
+          </article>
+        </div>
+      </div>
+      <div class="footer">
+        <span>This sequence demonstrates correctness, traceability, and practical usability</span>
+        <span>Slide 8</span>
+      </div>
+    </section>
+
+    <section class="slide" data-title="ROI">
+      <div class="topline">
+        <span class="chip">Business Case</span>
+        <span class="chip">Expected Impact</span>
+      </div>
+      <div class="content">
+        <h2>Projected Value (First 6 Months)</h2>
+        <ul>
+          <li><span class="accent">20-35% reduction</span> in diagnosis time for recurring faults.</li>
+          <li><span class="accent">Lower misconfiguration risk</span> through explicit parameter guidance and guardrails.</li>
+          <li><span class="accent">Improved consistency</span> of field support responses across teams.</li>
+          <li><span class="accent">Faster onboarding</span> for new engineers via context-rich assistance.</li>
+        </ul>
+        <p class="lead">Replace assumptions with guided, auditable, source-backed troubleshooting.</p>
+      </div>
+      <div class="footer">
+        <span>Projected impact shown; measured pilot values can be added after field validation</span>
+        <span>Slide 9</span>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Ask">
+      <div class="topline">
+        <span class="chip">Final Slide</span>
+        <span class="chip">Close Strong</span>
+      </div>
+      <div class="content">
+        <h2>Why This Solution Merits Selection</h2>
+        <ul>
+          <li>We solved a real field engineering problem with practical deployment value.</li>
+          <li>Our design balances accuracy, safety, and technical depth.</li>
+          <li>We proved reusability with automated indexing and scalable workflow patterns.</li>
+          <li>Our solution demonstrates mature Copilot usage: routing, context engineering, and agentic automation.</li>
+        </ul>
+        <p class="lead">We propose this as a reference pattern for future KONE engineering Copilot use cases.</p>
+      </div>
+      <div class="footer">
+        <span>Thank You | Q&amp;A</span>
+        <span>Slide 10</span>
+      </div>
+    </section>
+  </main>
+
+  <div class="hint">Use arrow keys or buttons. Press F for fullscreen. Press P to print as PDF.</div>
+  <div class="controls">
+    <button class="btn" id="prevBtn" type="button">Prev</button>
+    <button class="btn" id="nextBtn" type="button">Next</button>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    let index = 0;
+
+    function showSlide(nextIndex) {
+      index = (nextIndex + slides.length) % slides.length;
+      slides.forEach((s, i) => s.classList.toggle('active', i === index));
+      document.title = `Slide ${index + 1}/${slides.length} - ${slides[index].dataset.title || 'Presentation'}`;
+    }
+
+    prevBtn.addEventListener('click', () => showSlide(index - 1));
+    nextBtn.addEventListener('click', () => showSlide(index + 1));
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+        e.preventDefault();
+        showSlide(index + 1);
+      }
+      if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        showSlide(index - 1);
+      }
+      if (e.key.toLowerCase() === 'f') {
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+        else document.exitFullscreen();
+      }
+      if (e.key.toLowerCase() === 'p') window.print();
+    });
+
+    showSlide(0);
+  </script>
+</body>
+</html>

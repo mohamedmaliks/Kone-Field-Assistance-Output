@@ -1,30 +1,256 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>KONE Help Desk Public Output</title>
-  <style>
-    body { font-family: Segoe UI, Arial, sans-serif; margin: 28px; line-height: 1.5; }
-    .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; max-width: 940px; }
-    .muted { color: #666; }
-    code { background: #f4f4f4; padding: 2px 6px; border-radius: 6px; }
-    table { border-collapse: collapse; margin-top: 10px; }
-    td, th { border: 1px solid #ddd; padding: 8px 10px; text-align: left; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KONE Field Technician Assistant</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap');
+
+        :root {
+            --kone-blue: #00339a;
+            --kone-blue-dark: #00246d;
+            --bg-top: #dfe8f6;
+            --bg-bottom: #eef2f8;
+            --surface: #f8fafc;
+            --panel: #ffffff;
+            --text-dark: #10233d;
+            --text-muted: #4b5f7c;
+            --border-color: #d5deea;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Barlow', 'Segoe UI', sans-serif;
+            margin: 0; 
+            background: linear-gradient(160deg, var(--bg-top), var(--bg-bottom));
+            display: flex; 
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 18px;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 1120px;
+            height: 92vh;
+            background: var(--panel);
+            border-radius: 16px;
+            box-shadow: 0 20px 48px rgba(9, 30, 66, 0.16);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid #c9d4e5;
+        }
+
+        header {
+            background: linear-gradient(120deg, var(--kone-blue-dark), var(--kone-blue));
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .title-group {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            opacity: 0.88;
+            font-weight: 500;
+        }
+
+        .status-pill {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 999px;
+            padding: 7px 12px;
+        }
+
+        #chat-box { 
+            flex-grow: 1; 
+            overflow-y: auto; 
+            padding: 22px 24px; 
+            background: var(--surface);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .welcome-banner {
+            border: 1px solid #c9d6ea;
+            background: linear-gradient(135deg, #eaf1fb, #f6f9ff);
+            color: var(--text-dark);
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 0.96rem;
+            font-weight: 500;
+        }
+
+        .message { 
+            max-width: 86%; 
+            padding: 14px 16px; 
+            border-radius: 10px; 
+            font-size: 1.08rem;
+            line-height: 1.48;
+            word-wrap: break-word;
+        }
+
+        .user-message { 
+            align-self: flex-end; 
+            background: linear-gradient(120deg, #0840b0, #00339a);
+            color: white; 
+            border-bottom-right-radius: 3px;
+            box-shadow: 0 4px 12px rgba(0, 51, 154, 0.25);
+        }
+
+        .agent-message { 
+            align-self: flex-start; 
+            background-color: #ffffff; 
+            color: var(--text-dark); 
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: 3px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.04);
+        }
+
+        .input-area { 
+            display: flex; 
+            gap: 10px;
+            padding: 16px 18px;
+            background: #f3f6fb;
+            border-top: 1px solid #d7e0ed;
+        }
+
+        input[type="text"] { 
+            flex: 1; 
+            padding: 13px 14px; 
+            border: 1px solid #c2cee1; 
+            border-radius: 10px; 
+            font-size: 1.04rem;
+            color: var(--text-dark);
+            background: #ffffff;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #2b59c3;
+            box-shadow: 0 0 0 3px rgba(43, 89, 195, 0.16);
+        }
+
+        button { 
+            min-width: 110px;
+            padding: 0 24px;
+            cursor: pointer; 
+            background: linear-gradient(120deg, #0840b0, #00339a); 
+            color: white; 
+            border: none; 
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1.04rem;
+            letter-spacing: 0.2px;
+        }
+
+        button:hover {
+            filter: brightness(1.04);
+        }
+
+        @media (max-width: 840px) {
+            .chat-container {
+                height: 95vh;
+                border-radius: 12px;
+            }
+
+            .message {
+                max-width: 93%;
+                font-size: 1rem;
+            }
+
+            .title {
+                font-size: 1.18rem;
+            }
+
+            .subtitle {
+                font-size: 0.86rem;
+            }
+
+            .status-pill {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>KONE Help Desk - Public Output</h1>
-  <div class="card">
-    <p><strong>Latest update:</strong> 2026-05-14 11:25:08 UTC</p>
-    <table>
-      <tr><th>Repository</th><td>mohamedmaliks/Kone-Field-Assistant</td></tr>
-      <tr><th>Branch</th><td>main</td></tr>
-      <tr><th>Commit</th><td>f8896c2c</td></tr>
-      <tr><th>Run ID</th><td>25857426826</td></tr>
-    </table>
-    <p class="muted">Code stays private. This page is the public output generated by GitHub Actions.</p>
-    <p>Raw status: <a href="status.json">status.json</a></p>
-  </div>
+    <div class="chat-container">
+        <header>
+            <div class="title-group">
+                <div class="title">KONE Field Assistance</div>
+                <div class="subtitle">Technician Decision Support</div>
+            </div>
+            <div class="status-pill">Live</div>
+        </header>
+        <div id="chat-box">
+            <div class="welcome-banner">Welcome to KONE Field Assistance. How may I help you today?</div>
+        </div>
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Enter fault code or parameter question (example: 348_2 pairing check failed)" onkeypress="if(event.key === 'Enter') sendMessage()">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const chatBox = document.getElementById('chat-box');
+            const message = input.value.trim();
+            if (!message) return;
+
+            chatBox.innerHTML += `<div class="message user-message">${message}</div>`;
+            input.value = '';
+            
+            const loadingId = 'loading-' + Date.now();
+            chatBox.innerHTML += `<div id="${loadingId}" class="message agent-message"><em>Analyzing...</em></div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                const apiBase = String(window.KONE_API_BASE || '').replace(/\/$/, '');
+                const endpoint = apiBase ? `${apiBase}/api/agent` : '/api/agent';
+                const response = await fetch(endpoint, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ message: message }) 
+                });
+                const data = await response.json();
+                
+                document.getElementById(loadingId).remove();
+                
+                // Format the response to handle line breaks properly
+                const formattedResponse = data.response.replace(/\n/g, '<br>');
+                chatBox.innerHTML += `<div class="message agent-message"><strong>Assistant:</strong><br>${formattedResponse}</div>`;
+            } catch (error) {
+                document.getElementById(loadingId).remove();
+                chatBox.innerHTML += `<div class="message agent-message" style="color: red;">Error connecting to backend.</div>`;
+            }
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+<script>window.KONE_API_BASE = "";</script>
 </body>
 </html>
